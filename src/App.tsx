@@ -8,6 +8,7 @@ import { ThemeProvider } from './components/ThemeProvider';
 function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [conversionType, setConversionType] = useState<string>('');
+  const [scale, setScale] = useState(1);
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
@@ -19,11 +20,14 @@ function App() {
               selectedFile={selectedFile}
               conversionType={conversionType}
               setConversionType={setConversionType}
+              scale={scale}
+              setScale={setScale}
             />
             <FileConversionZone
               selectedFile={selectedFile}
               setSelectedFile={setSelectedFile}
               conversionType={conversionType}
+              scale={scale}
             />
           </div>
         </main>

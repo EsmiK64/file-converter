@@ -1,7 +1,7 @@
 import { jsPDF } from 'jspdf';
 import { saveAs } from 'file-saver';
 
-export type ConversionFunction = (file: File) => Promise<void>;
+export type ConversionFunction = (file: File, scale?: number) => Promise<void>;
 
 async function convertImageToPDF(file: File) {
   const img = new Image();
@@ -47,7 +47,7 @@ async function convertImageToPDF(file: File) {
   });
 }
 
-async function convertSVGToPNG(file: File) {
+async function convertSVGToPNG(file: File, scale = 1) {
   const svgText = await file.text();
   const parser = new DOMParser();
   const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
@@ -73,6 +73,10 @@ async function convertSVGToPNG(file: File) {
     height = 600;
   }
   
+  // Apply scaling
+  width *= scale;
+  height *= scale;
+  
   // Set explicit dimensions on SVG
   svg.setAttribute('width', width.toString());
   svg.setAttribute('height', height.toString());
@@ -85,10 +89,10 @@ async function convertSVGToPNG(file: File) {
     const img = new Image();
     img.onload = () => {
       // Create a canvas with device pixel ratio for better quality
-      const scale = window.devicePixelRatio || 1;
+      const dpr = window.devicePixelRatio || 1;
       const canvas = document.createElement('canvas');
-      canvas.width = width * scale;
-      canvas.height = height * scale;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
       
       const ctx = canvas.getContext('2d', { alpha: true });
       if (!ctx) {
@@ -97,7 +101,7 @@ async function convertSVGToPNG(file: File) {
       }
       
       // Scale the context for high DPI displays
-      ctx.scale(scale, scale);
+      ctx.scale(dpr, dpr);
       
       // Clear the canvas (transparent background)
       ctx.clearRect(0, 0, width, height);
@@ -131,15 +135,15 @@ async function convertSVGToPNG(file: File) {
   });
 }
 
-async function convertToWebP(file: File) {
+async function convertToWebP(file: File, scale = 1) {
   const img = new Image();
   const imageUrl = URL.createObjectURL(file);
   
   return new Promise<void>((resolve, reject) => {
     img.onload = () => {
       const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
       
       const ctx = canvas.getContext('2d');
       if (!ctx) {
@@ -147,7 +151,7 @@ async function convertToWebP(file: File) {
         return;
       }
       
-      ctx.drawImage(img, 0, 0);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       
       canvas.toBlob(
         (blob) => {

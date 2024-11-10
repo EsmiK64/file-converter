@@ -6,11 +6,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
 
 interface ConversionOptionsProps {
   selectedFile: File | null;
   conversionType: string;
   setConversionType: (type: string) => void;
+  scale: number;
+  setScale: (scale: number) => void;
 }
 
 const CONVERSION_OPTIONS = {
@@ -45,15 +49,20 @@ const CONVERSION_OPTIONS = {
 export function ConversionOptions({ 
   selectedFile, 
   conversionType, 
-  setConversionType 
+  setConversionType,
+  scale,
+  setScale
 }: ConversionOptionsProps) {
   const availableConversions = selectedFile 
     ? CONVERSION_OPTIONS[selectedFile.type as keyof typeof CONVERSION_OPTIONS] || []
     : [];
 
+  const showScaleOptions = selectedFile?.type === 'image/svg+xml' && 
+    ['to-png', 'to-jpg', 'to-webp'].includes(conversionType);
+
   return (
     <Card className="p-6">
-      <div className="space-y-4">
+      <div className="space-y-6">
         <div>
           <h2 className="text-lg font-semibold mb-2">Convert your file</h2>
           <p className="text-sm text-muted-foreground">
@@ -77,6 +86,20 @@ export function ConversionOptions({
             ))}
           </SelectContent>
         </Select>
+
+        {showScaleOptions && (
+          <div className="space-y-4">
+            <Label>Output Scale: {scale}x</Label>
+            <Slider
+              value={[scale]}
+              onValueChange={([value]) => setScale(value)}
+              min={0.5}
+              max={64}
+              step={1}
+              className="w-full"
+            />
+          </div>
+        )}
       </div>
     </Card>
   );

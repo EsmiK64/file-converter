@@ -11,12 +11,14 @@ interface FileConversionZoneProps {
   selectedFile: File | null;
   setSelectedFile: (file: File | null) => void;
   conversionType: string;
+  scale: number;
 }
 
 export function FileConversionZone({ 
   selectedFile, 
   setSelectedFile, 
-  conversionType 
+  conversionType,
+  scale
 }: FileConversionZoneProps) {
   const [progress, setProgress] = useState(0);
   const [isConverting, setIsConverting] = useState(false);
@@ -56,7 +58,7 @@ export function FileConversionZone({
         setProgress((prev) => Math.min(prev + 10, 90));
       }, 200);
 
-      await converter(selectedFile);
+      await converter(selectedFile, scale);
       
       clearInterval(progressInterval);
       setProgress(100);
