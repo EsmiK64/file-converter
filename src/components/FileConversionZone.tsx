@@ -73,7 +73,7 @@ export function FileConversionZone({
 
   return (
     <div className="space-y-4">
-      <Card className="p-8">
+      <Card className="p-8 hover:cursor-pointer">
         <div
           {...getRootProps()}
           className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors
